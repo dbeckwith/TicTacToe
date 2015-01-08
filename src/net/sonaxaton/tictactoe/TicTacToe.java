@@ -9,34 +9,44 @@ import processing.core.PGraphics;
  */
 public class TicTacToe {
 
-    public final static int SIZE = 3;
-    public final static int BOARD_AREA = SIZE * SIZE;
+    public final static int SIZE = 3; // board size
+    public final static int BOARD_AREA = SIZE * SIZE; // board area
 
     public enum Player {
 
-        NONE,
+        NONE, // indicates no move in that spot yet
         X,
         O;
     }
 
-    private final Player[] board;
-    private final int win_num;
-    private Player curr_player;
-    private int last_move_x, last_move_y;
-    private int num_moves;
+    private final Player[] board; // board grid
+    private final int win_num; // number of pieces in a row needed to win
+    private Player curr_player; // the next player to move
+    private int last_move_x, last_move_y; // the position of the last move
+    private int num_moves; // the number of moves made so far
 
+    /**
+     * Creates a new blank Tic Tac Toe game
+     */
     public TicTacToe() {
         this.win_num = SIZE;
         board = new Player[BOARD_AREA];
+        // initialize board with Player.NONE
         for (int i = 0; i < board.length; i++) {
             board[i] = Player.NONE;
         }
+        // start with X
         curr_player = Player.X;
         last_move_x = -1;
         last_move_y = -1;
         num_moves = 0;
     }
 
+    /**
+     * Shallow copies the data from the given board into a new board.
+     *
+     * @param copy the template to copy from
+     */
     public TicTacToe(TicTacToe copy) {
         this.win_num = copy.win_num;
         this.board = copy.board.clone();
@@ -46,8 +56,17 @@ public class TicTacToe {
         this.num_moves = copy.num_moves;
     }
 
+    /**
+     * Determine if the given position is a valid move on this board.
+     *
+     * @param x
+     * @param y
+     *
+     * @return <code>true</code> if the move is valid, <code>false</code> if it is not
+     */
     public boolean validMove(int x, int y) {
         return get(x, y) == Player.NONE;
+        //<editor-fold defaultstate="collapsed" desc=" this commented out code was a simple AI for the players that would limit their choices, but it made a less interesting graph ">
 //        switch (curr_player) {
 //            case X:
 //                int xx = x,
@@ -127,13 +146,21 @@ public class TicTacToe {
 //            default:
 //                return false;
 //        }
+        // </editor-fold>
     }
 
+    /**
+     * Make a move by the current player in the given position on the board.
+     *
+     * @param x
+     * @param y
+     */
     public void move(int x, int y) {
         board[x + y * SIZE] = curr_player;
         last_move_x = x;
         last_move_y = y;
         num_moves++;
+        // set next player's turn
         switch (curr_player) {
             case X:
                 curr_player = Player.O;
@@ -146,10 +173,23 @@ public class TicTacToe {
         }
     }
 
+    /**
+     * Gets the number of moves made so far this game.
+     *
+     * @return
+     */
     public int getNumMoves() {
         return num_moves;
     }
 
+    /**
+     * Get the player marker at the given position. May be <code>Player.NONE</code> if no player has moved there yet.
+     *
+     * @param x
+     * @param y
+     *
+     * @return
+     */
     public Player get(int x, int y) {
         if (x < 0 || x >= SIZE || y < 0 || y >= SIZE) {
             return null;
@@ -157,6 +197,11 @@ public class TicTacToe {
         return board[x + y * SIZE];
     }
 
+    /**
+     * Gets the winning player if there is one.
+     *
+     * @return the winning player, or <code>null</code> if there is no winner yet, or <code>Player.NONE</code> if the game is a draw
+     */
     public Player getWinner() {
         int x = last_move_x;
         int y = last_move_y;
@@ -180,7 +225,6 @@ public class TicTacToe {
                     }
                 }
             }
-
         }
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
@@ -192,59 +236,60 @@ public class TicTacToe {
         return Player.NONE;
     }
 
+    /**
+     * Determines if the game is over yet.
+     *
+     * @return <code>true</code> if the game is over, <code>false</code> otherwise
+     */
     public boolean hasWinner() {
         return getWinner() != null;
     }
 
-//    private PGraphics getImg(Player p, int size) {
-//        PGraphics g = imgs.get(p).get(size);
-//        if (g != null) {
-//            return g;
-//        }
-//        else {
-//            g = app.createGraphics(size, size);
-//            g.beginDraw();
-//            g.colorMode(PConstants.HSB, 360, 100, 100, 100);
-//
-//            g.scale(size / SIZE, size / SIZE);
-//
-//            g.endDraw();
-//            imgs.get(p).put(size, g);
-//            return g;
-//        }
-//    }
+    /**
+     * Draws this Tic Tac Toe board.
+     *
+     * @param g the image to draw on
+     * @param x the x-position of the board
+     * @param y the y-position of the board
+     * @param w the width of the board
+     * @param h the height of the board
+     * @param fade how opaque the board should be drawn from 0 to 1 (not used)
+     */
     public void draw(PGraphics g, float x, float y, float w, float h, float fade) {
         g.pushStyle();
         g.pushMatrix();
+        // translate and scale
         g.translate(x, y);
         g.noStroke();
         g.scale(w, h);
         Player winner = getWinner();
+        // fill a background color based on the winner
         if (winner == Player.X) {
-            g.fill(0, 20, 100);
+            g.fill(0, 20, 100); // red for X
         }
         else if (winner == Player.O) {
-            g.fill(240, 20, 100);
+            g.fill(240, 20, 100); // blue for O
         }
         else if (winner == Player.NONE) {
-            g.fill(120, 20, 100);
+            g.fill(120, 20, 100); // green for a draw
         }
         else {
-            g.fill(0, 0, 100);
+            g.fill(0, 0, 100); // white for none
         }
         g.rect(0, 0, 1, 1);
 
         g.scale(1f / SIZE, 1f / SIZE);
-        float s = 0.05f;
-        float b = 0.01f;
-        for (int i = 0; i < SIZE; i++) {
+        float s = 0.05f; // stroke size of glyphs
+        float b = 0.01f; // border size
+        for (int i = 0; i < SIZE; i++) { // go through each position
             for (int j = 0; j < SIZE; j++) {
                 g.pushMatrix();
                 g.pushStyle();
-                g.translate(i, j);
+                g.translate(i, j); // translate to the position
 
-                switch (get(i, j)) {
+                switch (get(i, j)) { // draw a glyph based on the move there
                     case X:
+                        // draw an X shape based on the stroke size
                         g.noStroke();
                         g.fill(0, 100, 100);
                         g.beginShape();
@@ -267,6 +312,7 @@ public class TicTacToe {
                         g.endShape(PConstants.CLOSE);
                         break;
                     case O:
+                        // draw a circle based on the stroke size
                         g.stroke(240, 100, 100);
                         g.strokeWeight(s);
                         g.noFill();
@@ -277,9 +323,11 @@ public class TicTacToe {
                         break;
                 }
 
+                // this would fade the board
                 //g.fill(0, 0, 100, 100 * (1f - fade));
                 //g.rect(0, 0, 1, 1);
 
+                // draw the cell's border
                 g.noStroke();
                 g.fill(0);
                 g.rect(0, 0, b, 1);
@@ -296,6 +344,9 @@ public class TicTacToe {
         g.popStyle();
     }
 
+    /**
+     * Used for debugging; prints out the contents of the board.
+     */
     public void print() {
         for (int y = 0; y < SIZE; y++) {
             if (y != 0) {
