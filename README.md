@@ -21,4 +21,4 @@ at once. Zoom in to see more of them.
 
 Controls
 --------
-Zoom in with the mouse wheel, click and drag to pan. Press space to toggle between showing all boards and only winning boards.
+Zoom in with the mouse wheel, click and drag to pan. Press <kbd>spacebar</kbd> to toggle between showing all boards and only winning boards.
